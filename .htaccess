@@ -1,0 +1,142 @@
+#Remove index.php
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php/$1 [L]
+
+#Disable directory browsing
+Options All -Indexes
+
+#GZIP Compression
+<IfModule mod_gzip.c>
+	mod_gzip on Yes
+	mod_gzip_dechunk Yes
+	mod_gzip_item_include file \.(html?|txt|css|js|php|pl)$
+	mod_gzip_item_include handler ^cgi-script$
+	mod_gzip_item_include mime ^text\.*
+	mod_gzip_item_include mime ^application/x-javascript.*
+	mod_gzip_item_exclude mime ^image\.*
+	mod_gzip_item_exclude rspheader ^Content-Encoding:.*gzip.*
+</IfModule>
+
+#Deflate Compression
+<IfModule mod_deflate.c>
+	AddOutputFilterByType DEFLATE "application/atom+xml" \
+	"application/javascript" \
+	"application/json" \
+	"application/ld+json" \
+	"application/manifest+json" \
+	"application/rdf+xml" \
+	"application/rss+xml" \
+	"application/schema+json" \
+	"application/vnd.ms-fontobject" \
+	"application/x-font" \
+	"application/x-font-opentype" \
+	"application/x-font-otf" \
+	"application/x-font-truetype" \
+	"application/x-font-ttf" \
+	"application/x-font-woff" \
+	"application/x-javascript" \
+	"application/x-web-app-manifest+json" \
+	"application/xhtml+xml" \
+	"application/xml" \
+	"font/eot" \
+	"font/otf" \
+	"font/ttf" \
+	"font/opentype" \
+	"image/bmp" \
+	"image/svg+xml" \
+	"image/vnd.microsoft.icon" \
+	"image/x-icon" \
+	"text/cache-manifest" \
+	"text/css" \
+	"text/html" \
+	"text/javascript" \
+	"text/plain" \
+	"text/vcard" \
+	"text/vnd.rim.location.xloc" \
+	"text/vtt" \
+	"text/x-component" \
+	"text/x-cross-domain-policy" \
+	"text/xml"
+</IfModule>
+
+#Enable Keep Alive feature of Apache
+<ifModule mod_env.c>
+	SetEnv KeepAlive On
+	SetEnv KeepAliveTimeout 60
+	SetEnv MaxKeepAliveRequests 100
+</ifModule>
+
+<ifModule mod_headers.c>
+	Header unset Connection
+	Header set Connection keep-alive
+
+	Header unset Keep-Alive
+	Header set Keep-Alive timeout=60,max=100
+</ifModule>
+
+#Caching Files
+#<IfModule mod_expires.c>
+#	ExpiresActive On
+#	ExpiresByType image/jpg "access 1 month"
+#	ExpiresByType image/jpeg "access 1 month"
+#	ExpiresByType image/png "access 1 month"
+#	ExpiresByType image/x-icon "access 1 month"
+#	ExpiresByType text/css "access 1 month"
+#	ExpiresByType text/html "access 1 month"
+#	ExpiresByType text/x-javascript "access 1 month"
+#	ExpiresDefault "access 2 days"
+#</IfModule>
+
+#Prevent access to files
+<FilesMatch "\.(htaccess|htpasswd|ini|git|gitignore)$">
+	Order Allow,Deny
+	Deny from all
+</FilesMatch>
+
+#Redirect to a Secure https connection
+RewriteCond %{HTTP_HOST} !=localhost    
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP_HOST} ^[^.]+\.[^.]{3}$
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+#Disable server signature
+ServerSignature Off
+
+# BEGIN cPanel-generated php ini directives, do not edit
+# Manual editing of this file may result in unexpected behavior.
+# To make changes to this file, use the cPanel MultiPHP INI Editor (Home >> Software >> MultiPHP INI Editor)
+# For more information, read our documentation (https://go.cpanel.net/EA4ModifyINI)
+<IfModule php7_module>
+   php_flag display_errors Off
+   php_value max_execution_time 300
+   php_value max_input_time 180
+   php_value max_input_vars 1000
+   php_value memory_limit 128M
+   php_value post_max_size 32M
+   #php_value session.gc_maxlifetime 1440
+   #php_value session.save_path "/var/cpanel/php/sessions/ea-php72"
+   php_value upload_max_filesize 32M
+   php_flag zlib.output_compression Off
+</IfModule>
+<IfModule lsapi_module>
+   php_flag display_errors Off
+   php_value max_execution_time 300
+   php_value max_input_time 180
+   php_value max_input_vars 1000
+   php_value memory_limit 128M
+   php_value post_max_size 32M
+   #php_value session.gc_maxlifetime 1440
+   #php_value session.save_path "/var/cpanel/php/sessions/ea-php72"
+   php_value upload_max_filesize 32M
+   php_flag zlib.output_compression Off
+</IfModule>
+# END cPanel-generated php ini directives, do not edit
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# Set the “ea-php74” package as the default “PHP” programming language.
+#<IfModule mime_module>
+# AddHandler application/x-httpd-ea-php74 .php .php7 .phtml
+#</IfModule>
+# php -- END cPanel-generated handler, do not edit

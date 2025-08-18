@@ -7,6 +7,7 @@ application/logs/*
 !application/logs/index.html
 
 application/libraries/*
+application/libraries/Sendinblue.php
 
 !application/*/.htaccess
 

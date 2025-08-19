@@ -70,6 +70,36 @@ class Main extends CI_Controller {
 
 		$this->load->view('camp/page-error', $data);
 	}
+
+
+	/* webform functions */
+
+	public function displayWebForm(){
+
+		$this->load->view('webform');
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	
 	public function issues() {
 	    

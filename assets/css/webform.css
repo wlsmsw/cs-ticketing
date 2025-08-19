@@ -1,0 +1,346 @@
+* {
+    margin: 0;
+    padding: 0;
+    outline: none;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+body {
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    overflow-x: hidden;
+    width: 100%;
+    min-height: 100vh;
+    margin: auto;
+    position: relative;
+    color: #4e4e4e;
+}
+
+body::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    background-color: #F5F5F5;
+}
+
+body::-webkit-scrollbar {
+    width: 6px;
+    background-color: #F5F5F5;
+}
+
+body::-webkit-scrollbar-thumb {
+    background-color: #fa9a21;
+}
+
+img {
+    max-width: 100%;
+}
+
+footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: .5rem 1rem;
+    width: 100%;
+    text-align: center;
+}
+
+footer p {
+    margin: 0;
+    color: #4e4e4e;
+    font-size: .7rem;
+    line-height: 1.1;
+}
+
+button {
+    cursor: pointer;
+    outline: none;
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled,
+button:disabled {
+    cursor: not-allowed !important;
+    opacity: .7;
+}
+
+.label {
+    display: inline;
+    padding: 0.2em 0.6em 0.3em;
+    font-size: 75%;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25em;
+}
+
+.label-default {
+    background-color: #777;
+}
+
+.label-primary {
+    background-color: #337ab7;
+}
+
+.label-success {
+    background-color: #5cb85c;
+}
+
+.label-info {
+    background-color: #5bc0de;
+}
+
+.label-warning {
+    background-color: #f0ad4e;
+}
+
+.label-danger {
+    background-color: #d9534f;
+}
+
+
+/**
+ * registration
+ */
+.player-register {
+    background: #1e1e1e;
+    display: flex;
+    justify-content: center;
+    align-content: flex-start;
+}
+
+.rty-register-wrapper {
+    padding: 1rem;
+    width: 70%;
+    text-align: center;
+}
+
+.rty-register-wrapper.registered {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.rty-register-wrapper .logo img {
+    width: 175px;
+}
+
+.rty-register-wrapper .logo p {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 9px;
+    color: #fff;
+}
+
+.rty-register-wrapper .logo p span {
+    color: #f9a031;
+}
+
+.player-register #frmRegister {
+    margin: 2.5rem 0;
+}
+
+.player-register #frmRegister .note {
+    color: #f1f1f1;
+    line-height: 1.1;
+    margin-bottom: 2rem;
+}
+
+.player-register #frmRegister .form-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.player-register #frmRegister .form-content > div {
+    width: 50%;
+    padding: 0 1rem;
+}
+
+.player-register #frmRegister .form-content-bottom > div {
+    width: 100%;
+    padding: 0 1rem;
+}
+
+.player-register #frmRegister label {
+    text-align: left;
+    display: block;
+    margin: 0;
+    line-height: 1.1;
+    color: #939393;
+}
+
+.player-register #frmRegister input,
+.player-register #frmRegister select {
+    color: #f1f1f1;
+    background: none;
+    outline: none;
+    display: block;
+    width: 100%;
+    padding: 3px 1px;
+    border: none;
+    border-bottom: 1px solid #575757;
+}
+
+.player-register #frmRegister input::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
+.player-register #frmRegister select option {
+    background: #1e1e1e;
+    color: #f1f1f1;
+}
+
+.player-register #frmRegister input::placeholder {
+    color: #4e4e4e;
+    opacity: 1;
+}
+
+.player-register #frmRegister input::-ms-input-placeholder {
+    color: #4e4e4e;
+}
+
+.player-register #frmRegister input:-ms-input-placeholder {
+    color: #4e4e4e;
+}
+
+.player-register #frmRegister.button-group {
+    margin-top: 2.5rem;
+}
+
+.player-register #frmRegister button {
+    border: none;
+    outline: none;
+    cursor: pointer;
+    width: 150px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: #fff;
+    background: #f27900;
+    background: -moz-linear-gradient(top, #f27900 0%, #fa9a21 100%);
+    background: -webkit-linear-gradient(top, #f27900 0%,#fa9a21 100%);
+    background: linear-gradient(to bottom, #f27900 0%,#fa9a21 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f27900', endColorstr='#fa9a21',GradientType=0 );
+}
+
+.player-register textarea {
+    width: 100%;
+    height: 100%;
+    resize: none;
+    background-color: transparent;
+    color: #fff;
+    border: none;
+    border-bottom: 1px solid #575757;
+
+}
+
+
+
+/**
+ * Responsive layout
+ */
+@media screen and (max-width:  1240px) {
+    .rty-register-wrapper {
+        width: 80%;
+    }
+}
+
+@media screen and (max-width:  768px) {
+    .rty-register-wrapper {
+        width: 90%;
+    }
+
+@media screen and (max-width:  525px) {
+    .rty-register-wrapper {
+        width: 100%;
+    }
+    .rty-register-wrapper .logo img {
+        width: 125px;
+    }
+    .rty-register-wrapper .logo p {
+        font-size: .8rem;
+    }
+    .player-register #frmRegister {
+        margin-top: 1rem;
+    }
+    .player-register #frmRegister .note {
+        font-size: .9rem;
+        margin-bottom: 1rem;
+    }
+    .player-register #frmRegister .form-content {
+        flex-direction: column;
+    }
+    .player-register #frmRegister .form-content > div {
+        width: 100%;
+        padding: 0;
+    }
+    .player-register #frmRegister .form-content-bottom {
+        flex-direction: column;
+    }
+    .player-register #frmRegister .form-content-bottom > div {
+        width: 100%;
+        padding: 0;
+    }
+    .player-register #frmRegister label,
+    .player-register #frmRegister input, 
+    .player-register #frmRegister select {
+        font-size: .9rem;
+    }
+    .player-register #frmRegister button {
+        width: auto;
+        font-size: .9rem;
+        line-height: 1.2;
+    }
+
+    @media screen and (max-width:  376px) {
+    .rty-login-wrapper {
+        width: 95%;
+    }
+    .rty-register-wrapper {
+        width: 100%;
+    }
+    .rty-register-wrapper .logo img {
+        width: 125px;
+    }
+    .rty-register-wrapper .logo p {
+        font-size: .8rem;
+    }
+    .player-register #frmRegister {
+        margin-top: 1rem;
+    }
+    .player-register #frmRegister .note {
+        font-size: .9rem;
+        margin-bottom: 1rem;
+    }
+    .player-register #frmRegister .form-content {
+        flex-direction: column;
+    }
+    .player-register #frmRegister .form-content > div {
+        width: 100%;
+        padding: 0;
+    }
+
+    .player-register #frmRegister .form-content-bottom {
+        flex-direction: column;
+    }
+    .player-register #frmRegister .form-content-bottom > div {
+        width: 100%;
+        padding: 0;
+    }
+    .player-register #frmRegister label,
+    .player-register #frmRegister input, 
+    .player-register #frmRegister select {
+        font-size: .9rem;
+    }
+    .player-register #frmRegister button {
+        width: auto;
+        font-size: .9rem;
+        line-height: 1.2;
+    }
+}

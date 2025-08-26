@@ -49,6 +49,37 @@
 				<div class="form-content">
 					<div>
 
+						
+
+						
+						<div class="form-group">
+							<label>Username</label>
+							<input type="text" name="uname" autocomplete="off" minlength="6" maxlength="21" required>
+						</div>				
+
+						<div class="form-group">
+							<label>Last Name</label>
+							<input type="text" name="lname" autocomplete="off" required>
+						</div>
+
+						<div class="form-group">
+							<label>First Name</label>
+							<input type="text" name="fname" autocomplete="off" required>
+						</div>
+
+						<div class="form-group">
+							<label>Middle Name</label>
+							<input type="text" name="mname" autocomplete="off" required>
+						</div>
+
+
+						
+
+					</div>
+
+
+					<div>
+
 						<div class="form-group">
 							<label>Category</label>
 							<select name="channel" required>
@@ -62,30 +93,7 @@
 								<option value="Commendation">Commendation</option>
 							</select>
 						</div>
-
 						
-						<div class="form-group">
-							<label>Username</label>
-							<input type="text" name="uname" autocomplete="off" minlength="6" maxlength="21" required>
-						</div>
-
-						
-
-						<div class="form-group">
-							<label>First Name</label>
-							<input type="text" name="fname" autocomplete="off" required>
-						</div>
-
-
-						<div class="form-group">
-							<label>Email Address</label>
-							<input type="email" name="email" autocomplete="off" required>
-						</div>
-
-					</div>
-
-
-					<div>
 						<div class="form-group">
 							<label>Channel</label>
 							<select name="channel" required>
@@ -97,13 +105,8 @@
 						</div>
 
 						<div class="form-group">
-							<label>Last Name</label>
-							<input type="text" name="lname" autocomplete="off" required>
-						</div>
-
-						<div class="form-group">
-							<label>Middle Name</label>
-							<input type="text" name="mname" autocomplete="off" required>
+							<label>Email Address</label>
+							<input type="email" name="email" autocomplete="off" required>
 						</div>
 
 

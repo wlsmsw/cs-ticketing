@@ -54,7 +54,7 @@
 						
 						<div class="form-group">
 							<label>Username</label>
-							<input type="text" name="uname" autocomplete="off" minlength="6" maxlength="21" required>
+							<input type="text" name="uname" autocomplete="off" required>
 						</div>				
 
 						<div class="form-group">
@@ -82,7 +82,7 @@
 
 						<div class="form-group">
 							<label>Category</label>
-							<select name="channel" required>
+							<select name="category" required>
 								<option value=""></option>
 								<option value="Deposit">Deposit</option>
 								<option value="Withdrawal">Withdrawal</option>
@@ -112,7 +112,7 @@
 
 						<div class="form-group">
 							<label>Attachment</label>
-							<input type="file" name="upload_id" autocomplete="off" placeholder="Upload ID" accept=".jpg, .jpeg, .png, .pdf, .csv, .xls, .xsls, .doc, .docx" required>
+							<input type="file" name="upload_file" id="upload_file" autocomplete="off" placeholder="Upload Attachment" accept=".jpg, .jpeg, .png, .pdf, .csv, .xls, .xsls, .doc, .docx" required>
 						</div>
 		
 					</div>
@@ -123,7 +123,7 @@
 
 						<div class="form-group">
 							<label>Description</label>
-							<textarea name="description" autocomplete="off" rows=3 required> </textarea>
+							<textarea name="description" autocomplete="off" rows=3 required></textarea>
 						</div>
 				</div>
 
@@ -145,7 +145,8 @@
 		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 	    <script type="text/javascript">var base_url = "<?=base_url()?>";</script>
-		<script src="<?=base_url('assets/js/player.js')?>"></script>
+		<script src="<?=base_url('assets/js/rty-modal-1.2.5.min.js')?>"></script>
+		<script src="<?=base_url('assets/js/webform.js')?>"></script>
 
 
 </body>

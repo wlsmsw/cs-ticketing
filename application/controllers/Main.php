@@ -13,7 +13,7 @@ class Main extends CI_Controller {
 		parent::__construct();
 		$this->load->library(['campapi', 'crypt']);
 		//$this->load->model('madmin');
-		//$this->load->model('mmain');
+		$this->load->model('mmain');
 
 		$this->_access_token = (isset($_SESSION['access_token'])) ? $_SESSION['access_token'] : '';
 	}
@@ -81,34 +81,85 @@ class Main extends CI_Controller {
 	}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	
 	public function issues() {
 	    
 	    $this->checkIfLoggedIn();
 
 		$data['page'] = 'Issues';
-
+		
+		$data['open'] = $this->mmain->count_ticket(1);
+	    $data['onhold'] = $this->mmain->count_ticket(2);
+	    $data['cancelled'] = $this->mmain->count_ticket(3);
+	    $data['resolved'] = $this->mmain->count_ticket(4);
+		
+        $this->load->view('layouts/header',$data);
 		$this->load->view('issues');
+		$this->load->view('layouts/footer');
 
+	}
+	
+	public function get_issues_DT() {
+	    
+	    $draw = (isset($_POST['draw'])) ? $_POST['draw'] : 0;
+		$limit = (isset($_POST['start'])) ? $_POST['start'] : 0;
+		$rowperpage = (isset($_POST['length'])) ? $_POST['length'] : 0;
+		$columnIndex = (isset($_POST['order'][0]['column'])) ? $_POST['order'][0]['column'] : 0;
+		$columnName = (isset($_POST['columns'][$columnIndex]['data'])) ? $_POST['columns'][$columnIndex]['data'] : "";
+		$columnSortOrder = (isset($_POST['order'][0]['dir'])) ? $_POST['order'][0]['dir'] : "DESC";
+		$searchValue = (isset($_POST['search']['value'])) ? $_POST['search']['value'] : "";	
+		
+		$status = (isset($_POST['status_filter'])) ? $_POST['status_filter'] : 0;
+
+		// data
+		$page = '';
+		if($this->uri->segment(3) == "reports"){
+		    $page = 'r';
+		}
+		$data = array();
+		$totalRecords = $this->mmain->get_issues_data($status, $searchValue, TRUE, $page);
+		$issues = $this->mmain->get_issues_data($status, $searchValue, FALSE, $page, $columnName, $columnSortOrder, $rowperpage, $limit);
+		
+	    $cnt = 0;
+		if(!empty($issues)) {
+		    foreach($issues as $row) {
+               
+                $ticket = 'MSWCS-' . sprintf('%05d', $row['CS_ID']);
+                
+                switch($status){
+                    case 1:
+                        $cs_status = 'Waiting for support';
+                        break;
+                    default:
+                        $cs_status = 'Pending';
+                }
+                
+    	        
+    	        $data[] = array(
+    	            'ticket' => $ticket,
+    	            'category' => $row['category'],
+    	            'username' => $row['username'],
+    	            'lastname' => $row['lastname'],
+    	            'firstname' => $row['firstname'],
+    	            'middlename' => $row['middlename'],
+    	            'channel' => $row['channel'],
+    	            'email' => $row['email'],
+    	            'assignedto' => 'MSW CS',
+    	            'status'=> $cs_status,
+    	            'datereported' => date('M j, Y h:i:s A', strtotime($row['date_added'])),
+    	        );
+
+		    }
+		}
+       
+		session_write_close();
+
+		echo json_encode(array(
+			'draw' => intval($draw),
+			'iTotalRecords' => $totalRecords[0]['total'],
+			'iTotalDisplayRecords' => $totalRecords[0]['total'],
+			'aaData' => $data
+		));
 	}
 	
 }

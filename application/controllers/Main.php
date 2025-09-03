@@ -45,14 +45,14 @@ class Main extends CI_Controller {
 				);
 
 				$this->session->set_userdata($session);
-				// Redirect to React frontend dashboard
+				
 				// Environment-based redirect to React frontend
 				if($_SERVER['SERVER_NAME'] == 'localhost') {
 					redirect('http://localhost:3002/dashboard');
 				} elseif($_SERVER['SERVER_NAME'] == 'mswsites.com') {
 					redirect('https://mswsites.com/cs-ticketing/dashboard');
 				} else {
-					// Production - to be determined based on actual server structure
+					// Production - flexible for any domain
 					redirect('https://' . $_SERVER['SERVER_NAME'] . '/cs-ticketing/dashboard');
 				}
 			}

@@ -46,7 +46,7 @@ class Main extends CI_Controller {
 
 				$this->session->set_userdata($session);
 				
-				// Environment-based redirect to React frontend
+				// Direct redirect to React frontend (skip issues route)
 				if($_SERVER['SERVER_NAME'] == 'localhost') {
 					redirect('http://localhost:3002/dashboard');
 				} elseif($_SERVER['SERVER_NAME'] == 'mswsites.com') {

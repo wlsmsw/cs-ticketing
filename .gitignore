@@ -1,5 +1,17 @@
 .DS_Store
 
+# Configuration files with sensitive data
+application/config/database.php
+application/config/config.php
+
+# Upload directory (contains user files)
+assets/img/uploads/*
+!assets/img/uploads/.htaccess
+!assets/img/uploads/index.html
+
+# Custom log files
+ticket_logs.txt
+
 application/cache/*
 !application/cache/index.html
 

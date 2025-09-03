@@ -23,7 +23,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = _SITE_URL_;
+// Environment-based base URL configuration
+if($_SERVER['SERVER_NAME'] == 'localhost') {
+    $config['base_url'] = 'http://localhost/office/cs-ticketing-backend/';
+} else {
+    // Production - auto-detect or set your domain
+    $config['base_url'] = 'https://' . $_SERVER['SERVER_NAME'] . '/cs-ticketing/';
+}
 
 /*
 |--------------------------------------------------------------------------

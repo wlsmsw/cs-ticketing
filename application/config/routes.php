@@ -60,3 +60,7 @@ $route['error'] = 'main/error';
 
 $route['issues'] = 'main/issues';
 
+// API Routes
+$route['api/stats'] = 'api/stats';
+$route['api/tickets'] = 'api/tickets';
+

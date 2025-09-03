@@ -45,7 +45,16 @@ class Main extends CI_Controller {
 				);
 
 				$this->session->set_userdata($session);
-				redirect(base_url('issues'));
+				// Redirect to React frontend dashboard
+				// Environment-based redirect to React frontend
+				if($_SERVER['SERVER_NAME'] == 'localhost') {
+					redirect('http://localhost:3002/dashboard');
+				} elseif($_SERVER['SERVER_NAME'] == 'mswsites.com') {
+					redirect('https://mswsites.com/cs-ticketing/dashboard');
+				} else {
+					// Production - to be determined based on actual server structure
+					redirect('https://' . $_SERVER['SERVER_NAME'] . '/cs-ticketing/dashboard');
+				}
 			}
 		} else {
 			$data['message'] = "CAMP access token not found.";
@@ -86,16 +95,15 @@ class Main extends CI_Controller {
 	    
 	    $this->checkIfLoggedIn();
 
-		$data['page'] = 'Issues';
-		
-		$data['open'] = $this->mmain->count_ticket(1);
-	    $data['onhold'] = $this->mmain->count_ticket(2);
-	    $data['cancelled'] = $this->mmain->count_ticket(3);
-	    $data['resolved'] = $this->mmain->count_ticket(4);
-		
-        $this->load->view('layouts/header',$data);
-		$this->load->view('issues');
-		$this->load->view('layouts/footer');
+		// Environment-based redirect to React frontend dashboard
+		if($_SERVER['SERVER_NAME'] == 'localhost') {
+			redirect('http://localhost:3002/dashboard');
+		} elseif($_SERVER['SERVER_NAME'] == 'mswsites.com') {
+			redirect('https://mswsites.com/cs-ticketing/dashboard');
+		} else {
+			// Production - to be determined based on actual server structure
+			redirect('https://' . $_SERVER['SERVER_NAME'] . '/cs-ticketing/dashboard');
+		}
 
 	}
 	

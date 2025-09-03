@@ -63,7 +63,7 @@ class Ticket extends CI_Controller {
                 
                 $ext = explode('/', $type);
     			$extension = (isset($ext[1])) ? $ext[1] : 'jpg';
-    			$uploadedFile = $_POST['lname'] . "_" . $_POST['fname'] . "_" . $_POST['mname'] . "_" . date('ymd') . "." . $extension;
+    			$uploadedFile = $data['lname'] . "_" . $data['fname'] . "_" . $data['mname'] . "_" . date('ymd') . "." . $extension;
     			$sourcePath = $_FILES['upload_file']['tmp_name'];
     			$imgPath = FCPATH;
     			$imgLink = 'assets/img/uploads/' . $uploadedFile;
@@ -104,11 +104,15 @@ class Ticket extends CI_Controller {
 			$content = $this->load->view('layouts/email-confirmation', $data, TRUE);
 			
 			//set receivers (static for now)
-			if($_SERVER['SERVER_NAME'] == 'mswlive.com' || $_SERVER['SERVER_NAME'] == 'affiliate.mswlive.com') {
+			if($_SERVER['SERVER_NAME'] == 'localhost') {
+				// Skip email on localhost - log to custom file
+				$logMessage = date('Y-m-d H:i:s') . " - Email would be sent to: " . $data['email'] . " for ticket: MSWCS-" . sprintf('%05d', $save) . " (Subject: " . $subject . ")\n";
+				file_put_contents(FCPATH . 'ticket_logs.txt', $logMessage, FILE_APPEND | LOCK_EX);
+			} elseif($_SERVER['SERVER_NAME'] == 'mswlive.com' || $_SERVER['SERVER_NAME'] == 'affiliate.mswlive.com') {
 					$recipient = array(
 						array(
-							'name' => $_POST['fname'].' '.$_POST['lname'],
-							'email' => $_POST['email']
+							'name' => $data['fname'].' '.$data['lname'],
+							'email' => $data['email']
 						),
 						array(
 							'name' => 'Sherwin Macalintal',
@@ -122,8 +126,8 @@ class Ticket extends CI_Controller {
 				} else {
 					$recipient = array(
 						array(
-							'name' => $_POST['fname'].' '.$_POST['lname'],
-							'email' => $_POST['email']
+							'name' => $data['fname'].' '.$data['lname'],
+							'email' => $data['email']
 						),
 						array(
 							'name' => 'Sherwin Macalintal',
@@ -136,7 +140,9 @@ class Ticket extends CI_Controller {
 					);
 				}
 				
-				$send = $this->sendTransactionMail($recipient, $subject, $content, [], []);
+				if($_SERVER['SERVER_NAME'] != 'localhost') {
+					$send = $this->sendTransactionMail($recipient, $subject, $content, [], []);
+				}
 		}
 		
 		echo json_encode(array(

@@ -28,7 +28,7 @@ if($_SERVER['SERVER_NAME'] == 'localhost') {
     $config['base_url'] = 'http://localhost/office/cs-ticketing-backend/';
 } else {
     // Production - auto-detect or set your domain
-    $config['base_url'] = 'https://' . $_SERVER['SERVER_NAME'] . '/api/cs-ticketing/';
+    $config['base_url'] = 'https://' . $_SERVER['SERVER_NAME'] . '/cs-ticketing/';
 }
 
 /*

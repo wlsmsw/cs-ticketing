@@ -64,3 +64,7 @@ $route['issues'] = 'main/issues';
 $route['api/stats'] = 'api/stats';
 $route['api/tickets'] = 'api/tickets';
 
+// Ticket Routes
+$route['ticket/submitInternalTicket'] = 'ticket/submitInternalTicket';
+$route['ticket/submitWebformTicket'] = 'ticket/submitWebformTicket';
+

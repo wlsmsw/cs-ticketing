@@ -26,9 +26,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 // Environment-based base URL configuration
 if($_SERVER['SERVER_NAME'] == 'localhost') {
     $config['base_url'] = 'http://localhost/office/cs-ticketing-backend/';
+} elseif($_SERVER['SERVER_NAME'] == 'api.mswsites.com') {
+    // Staging environment
+    $config['base_url'] = 'https://api.mswsites.com/cs-helpdesk/';
 } else {
     // Production - auto-detect or set your domain
-    $config['base_url'] = 'https://' . $_SERVER['SERVER_NAME'] . '/cs-ticketing/';
+    $config['base_url'] = 'https://' . $_SERVER['SERVER_NAME'] . '/cs-helpdesk/';
 }
 
 /*

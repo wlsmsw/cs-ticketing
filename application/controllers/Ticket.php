@@ -11,7 +11,194 @@ class Ticket extends CI_Controller {
 
 		$this->_access_token = (isset($_SESSION['access_token'])) ? $_SESSION['access_token'] : '';
 	}
+	
+	private function enableCORS() {
+        // Allow from any origin
+        if (isset($_SERVER['HTTP_ORIGIN'])) {
+            header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
+            header('Access-Control-Allow-Credentials: true');
+            header('Access-Control-Max-Age: 86400');
+        }
+
+        // Handle preflight requests
+        if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+            if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
+                header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+            }
+            if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
+                header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
+            }
+            exit(0);
+        }
+    }
     
+    
+    public function submitInternalTicket(){
+        
+        // Enable CORS
+        $this->enableCORS();
+        
+        // Set JSON response header
+        $this->output->set_content_type('application/json');
+        
+        // Basic session check - user must be logged in to dashboard
+        if(empty($this->session->userdata('access_token')) || empty($this->session->userdata('uname'))){
+            $this->output
+                ->set_status_header(401)
+                ->set_output(json_encode([
+                    'success' => FALSE,
+                    'message' => "Authentication required. Please login first."
+                ]));
+            return;
+        }
+        
+        // Note: Using basic session validation for internal tickets
+        // CAMP validation can be re-enabled if needed for additional security
+        
+        $status = FALSE;
+        $response = "Something went wrong upon submission of your ticket. Please try again.";
+        
+        // Check form data (adjusted for internal form structure)
+        if(isset($_POST)){
+            // Parse customer name into separate fields
+            $customerName = $_POST['customerName'] ?? '';
+            $nameParts = explode(' ', trim($customerName));
+            
+            $data['uname']          = $_POST['username'] ?? '';
+            $data['fname']          = $nameParts[0] ?? '';
+            $data['lname']          = end($nameParts) ?? '';
+            $data['mname']          = (count($nameParts) > 2) ? $nameParts[1] : '';
+            $data['category']       = $_POST['category'] ?? '';
+            $data['channel']        = $_POST['channel'] ?? '';
+            $data['email']          = $_POST['customerEmail'] ?? '';
+            $data['description']    = $_POST['description'] ?? '';
+            $data['date_submitted'] = date('Y-m-d H:i:s');
+        } else {
+            $this->output
+                ->set_status_header(400)
+                ->set_output(json_encode([
+                    'success' => FALSE,
+                    'message' => "Error in retrieving form data. Please try again."
+                ]));
+            return;
+        }
+        
+        // Handle file upload (same logic as web form)
+        $uploadedID = '';
+        $sourcePath = '';
+        $imgPath = '';
+        $imgLink = '';
+        $attachments = array();
+        $dbattachment = array();
+        
+        $allowed_types = array('image/jpeg','image/jpg','image/png','application/pdf','text/csv','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/msword');
+        
+        if(isset($_FILES['attachment']) && !empty($_FILES['attachment'])) {
+            
+            $type = $_FILES['attachment']['type'];
+
+            if($_FILES['attachment']['size'] > 10100000) {
+                $this->output
+                    ->set_status_header(400)
+                    ->set_output(json_encode([
+                        'success' => FALSE,
+                        'message' => "Uploaded file size should be 10MB or less."
+                    ]));
+                return;
+            }
+
+            if(in_array($type,$allowed_types)){
+                
+                $ext = explode('/', $type);
+                $extension = (isset($ext[1])) ? $ext[1] : 'jpg';
+                $uploadedFile = $data['lname'] . "_" . $data['fname'] . "_" . $data['mname'] . "_" . date('ymd') . "." . $extension;
+                $sourcePath = $_FILES['attachment']['tmp_name'];
+                $imgPath = FCPATH;
+                $imgLink = 'assets/img/uploads/' . $uploadedFile;
+                
+                $attachments[] = array(
+                    'content' => base64_encode(file_get_contents($sourcePath)),
+                    'name' => $uploadedFile
+                );
+                
+                array_push($dbattachment,$uploadedFile);
+                
+                move_uploaded_file($sourcePath, $imgLink);
+                
+            } else {
+                $this->output
+                    ->set_status_header(400)
+                    ->set_output(json_encode([
+                        'success' => FALSE,
+                        'message' => "The file selected cannot be uploaded in the system."
+                    ]));
+                return;
+            }
+        }
+        
+        $data['attachments'] = json_encode($dbattachment);
+        
+        $save = $this->mticket->saveWebformTicket($data);
+        
+        if($save){
+            $status = TRUE;
+            $response = 'Ticket created successfully. Ticket ID: MSWCS-' . sprintf('%05d', $save);
+            
+            // Send email (same logic as web form)
+            $subject = "[CS Ticketing] (MSWCS-" . sprintf('%05d', $save) . ") - " . $data['uname'];
+            $content = $this->load->view('layouts/email-confirmation', $data, TRUE);
+            
+            // Set receivers (static for now)
+            if($_SERVER['SERVER_NAME'] == 'localhost') {
+                // Skip email on localhost - log to custom file
+                $logMessage = date('Y-m-d H:i:s') . " - Email would be sent to: " . $data['email'] . " for ticket: MSWCS-" . sprintf('%05d', $save) . " (Subject: " . $subject . ")\n";
+                file_put_contents(FCPATH . 'ticket_logs.txt', $logMessage, FILE_APPEND | LOCK_EX);
+            } elseif($_SERVER['SERVER_NAME'] == 'mswlive.com' || $_SERVER['SERVER_NAME'] == 'affiliate.mswlive.com' || $_SERVER['SERVER_NAME'] == 'api.mswsites.com') {
+                $recipient = array(
+                    array(
+                        'name' => $data['fname'].' '.$data['lname'],
+                        'email' => $data['email']
+                    ),
+                    array(
+                        'name' => 'Sherwin Macalintal',
+                        'email' => 'sherwinnino.macalintal@megasportsworld.com'
+                    ),
+                    array(
+                        'name' => 'MSW ITPD',
+                        'email' => 'itprojectsdevelopment@megasportsworld.com'
+                    )
+                );
+            } else {
+                $recipient = array(
+                    array(
+                        'name' => $data['fname'].' '.$data['lname'],
+                        'email' => $data['email']
+                    ),
+                    array(
+                        'name' => 'Sherwin Macalintal',
+                        'email' => 'sherwinnino.macalintal@megasportsworld.com'
+                    ),
+                    array(
+                        'name' => 'MSW ITPD',
+                        'email' => 'itprojectsdevelopment@megasportsworld.com'
+                    )
+                );
+            }
+            
+            if($_SERVER['SERVER_NAME'] != 'localhost') {
+                $send = $this->sendTransactionMail($recipient, $subject, $content, [], []);
+            }
+        }
+        
+        $this->output->set_output(json_encode(array(
+            'success' => $status,
+            'message' => $response,
+            'ticket_id' => $save ? 'MSWCS-' . sprintf('%05d', $save) : null
+        )));
+
+        session_write_close();
+        
+    }
     
     public function submitWebformTicket(){
         
@@ -108,7 +295,7 @@ class Ticket extends CI_Controller {
 				// Skip email on localhost - log to custom file
 				$logMessage = date('Y-m-d H:i:s') . " - Email would be sent to: " . $data['email'] . " for ticket: MSWCS-" . sprintf('%05d', $save) . " (Subject: " . $subject . ")\n";
 				file_put_contents(FCPATH . 'ticket_logs.txt', $logMessage, FILE_APPEND | LOCK_EX);
-			} elseif($_SERVER['SERVER_NAME'] == 'mswlive.com' || $_SERVER['SERVER_NAME'] == 'affiliate.mswlive.com') {
+			} elseif($_SERVER['SERVER_NAME'] == 'mswlive.com' || $_SERVER['SERVER_NAME'] == 'affiliate.mswlive.com' || $_SERVER['SERVER_NAME'] == 'api.mswsites.com') {
 					$recipient = array(
 						array(
 							'name' => $data['fname'].' '.$data['lname'],

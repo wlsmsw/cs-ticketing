@@ -86,9 +86,11 @@ defined('EXIT__AUTO_MAX')      OR define('EXIT__AUTO_MAX', 125); // highest auto
 
 //site urls
 if($_SERVER['SERVER_NAME'] == 'mswlive.com'){
-    define('_SITE_URL_', 'https://mswlive.com/cs-ticketing/');
+    define('_SITE_URL_', 'https://mswlive.com/cs-helpdesk/');
 }else if($_SERVER['SERVER_NAME'] == 'mswsites.com'){
-    define('_SITE_URL_', 'https://mswsites.com/cs-ticketing/');
+    define('_SITE_URL_', 'https://mswsites.com/cs-helpdesk/');
+}else if($_SERVER['SERVER_NAME'] == 'api.mswsites.com'){
+    define('_SITE_URL_', 'https://api.mswsites.com/cs-helpdesk/');
 }else{
     define('_SITE_URL_', 'http://localhost/office/cs-ticketing/');
 }

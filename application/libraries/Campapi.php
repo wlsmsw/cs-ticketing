@@ -28,7 +28,7 @@ class CAMPAPI {
 
 			$_url = 'https://api.mswlive.com/aim/';
 
-		} elseif($_SERVER['SERVER_NAME'] == 'mswsites.com') {
+		} elseif($_SERVER['SERVER_NAME'] == 'mswsites.com' || $_SERVER['SERVER_NAME'] == 'api.mswsites.com') {
 
 			$_url = 'https://api.mswsites.com/aim/';
 

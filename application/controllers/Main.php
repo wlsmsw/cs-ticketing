@@ -18,6 +18,11 @@ class Main extends CI_Controller {
 		$this->_access_token = (isset($_SESSION['access_token'])) ? $_SESSION['access_token'] : '';
 	}
 
+	public function index() {
+		// Handle root cs-helpdesk calls - return API info or redirect
+		echo json_encode(['status' => 'CS Helpdesk API', 'version' => '1.0']);
+	}
+
 
 	public function access() {
 	    

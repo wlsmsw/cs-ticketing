@@ -4,6 +4,20 @@ jQuery(document).ready(function($) {
     $('#frmRegister').on('submit', function(e) {
  		e.preventDefault();
  		var formData = new FormData($(this)[0]);
+ 		
+ 		// Transform field names for Laravel backend compatibility
+ 		var laravelData = new FormData();
+ 		laravelData.append('username', formData.get('uname'));
+ 		laravelData.append('firstname', formData.get('fname'));
+ 		laravelData.append('lastname', formData.get('lname'));
+ 		laravelData.append('middlename', formData.get('mname'));
+ 		laravelData.append('category', formData.get('category'));
+ 		laravelData.append('channel', formData.get('channel'));
+ 		laravelData.append('email', formData.get('email'));
+ 		laravelData.append('description', formData.get('description'));
+ 		if(formData.get('upload_file')) {
+ 			laravelData.append('attachment', formData.get('upload_file'));
+ 		}
 
  		$.rconfirm({
  			title: "Send Ticket",
@@ -14,18 +28,23 @@ jQuery(document).ready(function($) {
  						$.rloader();
  						$.ajax({
  							method: "POST",
- 							url: base_url + "ticket/submitWebformTicket",
+ 							url: "https://api.mswsites.com/cs-helpdesk/api/v1/tickets",
  							contentType: false,
  							cache: false,
  							processData: false,
- 							data: formData,
+ 							data: laravelData,
  							success: function(response) {
- 								var data = JSON.parse(response);
- 								if(data.status) {
- 									$.ralert("Success", data.response, 'success', "Close", function(){ window.location.reload(); });
+ 								// Laravel returns different response format
+ 								if(response.success) {
+ 									$.ralert("Success", response.message || "Your ticket has been submitted successfully!", 'success', "Close", function(){ window.location.reload(); });
  								} else {
- 									$.ralert("Error", data.response, 'error');
+ 									$.ralert("Error", response.message || "Failed to submit ticket", 'error');
  								}
+ 								$.rloader.hide();
+ 							},
+ 							error: function(xhr, status, error) {
+ 								console.error('Webform submission error:', error);
+ 								$.ralert("Error", "Failed to submit ticket. Please try again.", 'error');
  								$.rloader.hide();
  							}
  						});

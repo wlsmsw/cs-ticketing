@@ -205,18 +205,19 @@ class Ticket extends CI_Controller {
         $status = FALSE;
 		$response = "Something went wrong upon submission of your ticket. Please try again.";
 		
-		//check form data
+		// Check form data
 		if(isset($_POST)){
-		    $data['uname']          =   $_POST['uname'];
-		    $data['lname']          =   $_POST['lname'];
-		    $data['mname']          =   $_POST['mname'];
-		    $data['fname']          =   $_POST['fname'];
-		    $data['category']       =   $_POST['category'];
-		    $data['channel']        =   $_POST['channel'];
-		    $data['email']          =   $_POST['email'];
-		    $data['description']    =   $_POST['description'];
-		    $data['date_submitted'] =   date('Y-m-d H:i:s');
-		}else{
+		    $data = array(
+		        'username'      => $_POST['uname'],
+		        'lastname'      => $_POST['lname'],
+		        'middlename'    => $_POST['mname'],
+		        'firstname'     => $_POST['fname'],
+		        'category'      => $_POST['category'],
+		        'channel'       => $_POST['channel'],
+		        'email'         => $_POST['email'],
+		        'description'   => $_POST['description']
+		    );
+		} else {
 		    echo json_encode(array(
 				'status' => FALSE,
 				'response' => "Error in retrieving form data. Please try again."
@@ -224,20 +225,11 @@ class Ticket extends CI_Controller {
 			exit;
 		}
 		
-		//check files
-		$uploadedID = '';
-		$sourcePath = '';
-		$imgPath = '';
-		$imgLink = '';
-		$attachments = array();
-		$dbattachment = array();
-		
+		// Handle file upload (basic validation only - Laravel will handle the rest)
 		$allowed_types = array('image/jpeg','image/jpg','image/png','application/pdf','text/csv','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/msword');
 		
 		if(isset($_FILES['upload_file']) && !empty($_FILES['upload_file'])) {
-			
 			$type = $_FILES['upload_file']['type'];
-
 			if($_FILES['upload_file']['size'] > 10100000) {
 				echo json_encode(array(
 					'status' => FALSE,
@@ -245,91 +237,57 @@ class Ticket extends CI_Controller {
 				));
 				exit;
 			}
-
-            if(in_array($type,$allowed_types)){
-                
-                $ext = explode('/', $type);
-    			$extension = (isset($ext[1])) ? $ext[1] : 'jpg';
-    			$uploadedFile = $data['lname'] . "_" . $data['fname'] . "_" . $data['mname'] . "_" . date('ymd') . "." . $extension;
-    			$sourcePath = $_FILES['upload_file']['tmp_name'];
-    			$imgPath = FCPATH;
-    			$imgLink = 'assets/img/uploads/' . $uploadedFile;
-    			
-    			
-    			
-    			$attachments[] = array(
-    			    'content' => base64_encode(file_get_contents($sourcePath)),
-    			    'name' => $uploadedFile
-    			);
-    			
-    			array_push($dbattachment,$uploadedFile);
-    			
-    			move_uploaded_file($sourcePath, $imgLink);
-            
-                
-            }else{
+			if(!in_array($type, $allowed_types)){
                 echo json_encode(array(
 					'status' => FALSE,
 					'response' => "The file selected cannot be uploaded in the system."
 				));
 				exit;
             }
-			
-
+            
+            // Add attachment info for Laravel
+            $data['attachment'] = $_FILES['upload_file']['name'];
 		}
 		
-		$data['attachments'] = json_encode($dbattachment);
+		// Forward to Laravel backend
+		$laravel_url = ($_SERVER['SERVER_NAME'] == 'localhost') 
+		    ? 'http://localhost:8888/api/v1/tickets' 
+		    : 'https://' . $_SERVER['SERVER_NAME'] . '/cs-helpdesk-be/api/v1/tickets';
 		
-		$save = $this->mticket->saveWebformTicket($data);
+		// Prepare data for Laravel API
+		$postFields = array();
+		foreach($data as $key => $value) {
+		    $postFields[] = urlencode($key) . '=' . urlencode($value);
+		}
+		$postString = implode('&', $postFields);
 		
-		if($save){
-		    $status = TRUE;
-		    $response = 'Ticket sent. Our team will reach out to you shortly. Thank you.';
-		    
-		    //send email
-			$subject = "[CS Ticketing] (MSWCS-" . sprintf('%05d', $save) . ") - " . $data['uname'];
-			$content = $this->load->view('layouts/email-confirmation', $data, TRUE);
-			
-			//set receivers (static for now)
-			if($_SERVER['SERVER_NAME'] == 'localhost') {
-				// Skip email on localhost - log to custom file
-				$logMessage = date('Y-m-d H:i:s') . " - Email would be sent to: " . $data['email'] . " for ticket: MSWCS-" . sprintf('%05d', $save) . " (Subject: " . $subject . ")\n";
-				file_put_contents(FCPATH . 'ticket_logs.txt', $logMessage, FILE_APPEND | LOCK_EX);
-			} elseif($_SERVER['SERVER_NAME'] == 'mswlive.com' || $_SERVER['SERVER_NAME'] == 'affiliate.mswlive.com' || $_SERVER['SERVER_NAME'] == 'api.mswsites.com') {
-					$recipient = array(
-						array(
-							'name' => $data['fname'].' '.$data['lname'],
-							'email' => $data['email']
-						),
-						array(
-							'name' => 'Sherwin Macalintal',
-							'email' => 'sherwinnino.macalintal@megasportsworld.com'
-						),
-						array(
-							'name' => 'MSW ITPD',
-							'email' => 'itprojectsdevelopment@megasportsworld.com'
-						)
-					);
-				} else {
-					$recipient = array(
-						array(
-							'name' => $data['fname'].' '.$data['lname'],
-							'email' => $data['email']
-						),
-						array(
-							'name' => 'Sherwin Macalintal',
-							'email' => 'sherwinnino.macalintal@megasportsworld.com'
-						),
-						array(
-							'name' => 'MSW ITPD',
-							'email' => 'itprojectsdevelopment@megasportsworld.com'
-						)
-					);
-				}
-				
-				if($_SERVER['SERVER_NAME'] != 'localhost') {
-					$send = $this->sendTransactionMail($recipient, $subject, $content, [], []);
-				}
+		// Make cURL request to Laravel backend
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $laravel_url);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $postString);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+		    'Content-Type: application/x-www-form-urlencoded',
+		    'Content-Length: ' . strlen($postString)
+		));
+		
+		$result = curl_exec($ch);
+		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		curl_close($ch);
+		
+		if($httpCode == 201 && $result) {
+		    $laravelResponse = json_decode($result, true);
+		    if($laravelResponse && $laravelResponse['success']) {
+		        $status = TRUE;
+		        $response = 'Ticket sent. Our team will reach out to you shortly. Thank you.';
+		    } else {
+		        $response = isset($laravelResponse['message']) ? $laravelResponse['message'] : $response;
+		    }
+		} else {
+		    // Fallback: Log the error but don't expose technical details
+		    error_log("Webform Laravel API Error: HTTP $httpCode - " . $result);
+		    $response = "Unable to process your ticket at this time. Please try again later.";
 		}
 		
 		echo json_encode(array(

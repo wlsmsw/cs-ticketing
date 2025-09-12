@@ -55,6 +55,7 @@ $route['translate_uri_dashes'] = FALSE;
 
 $route['access'] = 'main/access';
 $route['error'] = 'main/error';
+$route['cs-helpdesk'] = 'main/issues';
 
 
 
